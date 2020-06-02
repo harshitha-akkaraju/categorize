@@ -7,7 +7,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
-
 URL = 'https://www.nytimes.com/column/the-daily'
 CHROME_DRIVER_PATH = './chromedriver'
 
@@ -16,7 +15,10 @@ class TheDailyScraper:
         self.__initialize_driver()
     
     def get_episode_data(self):
+        print("retrieving html elements...")
+        print()
         html_elements = self.__get_html_elements()
+
         episode_metadata = self.__get_episode_metadata(html_elements)
 
         self.__close_driver()
@@ -38,21 +40,12 @@ class TheDailyScraper:
                 button.click()
             except:
                 print("unable to click on the `Show More` button")
-            else:
-                try:
-                    temp = self.driver.find_elements_by_css_selector(LIST_ELEM_CSS_SELECTOR)
-                    results.extend(temp)
-                except:
-                    print("no elements with the said list elem styles")
             
-            # time.sleep(3)
-            counter += 1
+            time.sleep(3)
+            counter += 
 
-            if counter == 3:
-                break
-
+        results = self.driver.find_elements_by_css_selector(LIST_ELEM_CSS_SELECTOR) 
         return results
-
 
     def __get_episode_metadata(self, html_elements):
         daily_episodes = {}
@@ -61,6 +54,8 @@ class TheDailyScraper:
         dates = []
         links = []
 
+        print("compiling episode metadata...")
+        print()
         for elem in html_elements:
             title_tag = elem.find_element_by_tag_name('h2')
             headline_tag = elem.find_element_by_tag_name('p')
@@ -81,9 +76,35 @@ class TheDailyScraper:
         daily_episodes["headline"] = headlines
         daily_episodes["date"] = dates
         daily_episodes["link"] = links
-
+        daily_episodes["description"] = self.__get_episode_descriptions(daily_episodes)
         return daily_episodes
     
+    def __get_episode_descriptions(self, episode_metadata):
+        links = episode_metadata["link"]
+        descriptions = []
+
+        print("retrieving episode descriptions...")
+        print()
+        for link in links:
+            response = requests.get(link)
+            page_content = BeautifulSoup(response.text, 'html.parser')
+
+            DESCRIPTION_SECTION_CLASS_NAME = 'css-53u6y8'
+            P_TAGS_CLASS_NAME = 'css-158dogj evys1bk0'
+
+            section_tag = page_content.find('div', class_=DESCRIPTION_SECTION_CLASS_NAME)
+            p_tags = section_tag.find_all('p', class_=P_TAGS_CLASS_NAME)
+            # concatenate description paragraphs
+            description = ''
+            for i in range(len(p_tags)):
+                if i != 0:
+                    description += (p_tags[i].text + '\n')
+
+            descriptions.append(description)
+        
+        return descriptions
+
+
     def __initialize_driver(self):
         # selenium also supports other WebDrivers 
         self.driver = webdriver.Chrome(CHROME_DRIVER_PATH)

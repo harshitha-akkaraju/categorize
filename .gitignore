@@ -1,2 +1,4 @@
 scraper/chromedriver
 .DS_Store
+scraper/__pycache__
+scraper/data
