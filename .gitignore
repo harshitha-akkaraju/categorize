@@ -6,3 +6,6 @@ scraper/data
 
 rss_feed_parser/__pycache__
 rss_feed_parser/data
+
+nlp/__pycache__
+nlp/data
