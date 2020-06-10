@@ -1,5 +1,8 @@
 from urllib.request import urlopen
+
 from bs4 import BeautifulSoup
+from bs4 import NavigableString
+
 import pandas as pd
 
 THE_DAILY_RSS_FEED_URL = "http://rss.art19.com/the-daily"
@@ -26,7 +29,8 @@ class TheDailyParser:
 
         for i, item in enumerate(item_list):
             title = item.title.text
-            description = item.description.text
+            description = self.__get_description(item.description.text)
+            
             date = item.pubDate.text
             duration = item_durations[i].string
             link = item.enclosure.get('url')
@@ -45,6 +49,34 @@ class TheDailyParser:
         
         return daily_episodes
     
+    def __get_description(self, text):
+        description = ""
+        soup = BeautifulSoup(text, "html.parser")
+        p_tags = soup.find_all('p')
+        for p_tag in p_tags:
+            description += self.__recurse(p_tag, "") + " "
+
+        ul_tags = soup.find_all('ul')
+        for ul_tag in ul_tags:
+            description += self.__recurse(ul_tag, "") + " "
+
+        return description
+    
+    def __recurse(self, tag, text):
+        if tag.children == None:
+            text += tag.get_text()
+            return text
+        
+        temp = ""
+        for child in tag.children:
+            if isinstance(child, NavigableString):
+                temp += child.string + " "
+            else:
+                temp += self.__recurse(child, text) + " "
+        
+        return text + temp
+
+
     def episode_info_as_df(self):
         daily_episodes = self.__parse_feed()
         episode_data_df = pd.DataFrame.from_dict(daily_episodes)
