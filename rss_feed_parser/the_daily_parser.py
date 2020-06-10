@@ -30,7 +30,6 @@ class TheDailyParser:
         for i, item in enumerate(item_list):
             title = item.title.text
             description = self.__get_description(item.description.text)
-            
             date = item.pubDate.text
             duration = item_durations[i].string
             link = item.enclosure.get('url')
@@ -52,7 +51,11 @@ class TheDailyParser:
     def __get_description(self, text):
         description = ""
         soup = BeautifulSoup(text, "html.parser")
+
         p_tags = soup.find_all('p')
+        if len(p_tags) == 0:
+            return text
+        
         for p_tag in p_tags:
             description += self.__recurse(p_tag, "") + " "
 
