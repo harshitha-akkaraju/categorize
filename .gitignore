@@ -7,5 +7,6 @@ scraper/data
 rss_feed_parser/__pycache__
 rss_feed_parser/data
 
-nlp/__pycache__
-nlp/data
+kmeans_clustering/__pycache__
+kmeans_clustering/data
+kmeans_clustering/models

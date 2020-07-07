@@ -84,3 +84,22 @@ class TheDailyParser:
         daily_episodes = self.__parse_feed()
         episode_data_df = pd.DataFrame.from_dict(daily_episodes)
         return episode_data_df
+
+
+    def csv_to_text_data(self, data_path, file_path):
+        episode_data_df = pd.read_csv(data_path)
+
+        # write title and description to a different file
+        titles = episode_data_df["title"].tolist()
+        descriptions = episode_data_df["description"].tolist()
+
+        writer = open(file_path,'w')
+        for i in range(0, len(titles)):
+            line = titles[i] + descriptions[i] + "\n"
+            writer.write(line)
+        
+        writer.close()
+
+    def write_data_to_csv(self, file_path):
+        episode_data_df = self.episode_info_as_df()
+        episode_data_df.to_csv(file_path, index=False)
