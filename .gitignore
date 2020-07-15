@@ -10,3 +10,5 @@ rss_feed_parser/data
 kmeans_clustering/__pycache__
 kmeans_clustering/data
 kmeans_clustering/models
+
+src/__pycache__

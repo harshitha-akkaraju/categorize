@@ -63,6 +63,7 @@ class TheDailyParser:
         for ul_tag in ul_tags:
             description += self.__recurse(ul_tag, "") + " "
 
+        description = description.replace("\n", "")
         return description
     
     def __recurse(self, tag, text):
